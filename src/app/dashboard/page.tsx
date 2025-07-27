@@ -59,10 +59,10 @@ export default function Dashboard() {
         fetchDashboardMonthly(),
       ]);
       setData(walletData);
-      setDataMonthly(mockFinancialData); // Using mock financial data
+      setDataMonthly(mockFinancialData);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      setDataMonthly(mockFinancialData); // Fallback to mock data
+      setDataMonthly(mockFinancialData);
     } finally {
       setIsLoading(false);
     }
@@ -374,24 +374,18 @@ export default function Dashboard() {
                   {/* Mock transaction data */}
                   {[
                     {
-                      wallet: "Dompet Utama",
-                      description: "Pembayaran Belanja Bulanan",
                       category: "Belanja",
                       amount: -1250000,
                       time: "2 jam yang lalu",
                       type: "expense",
                     },
                     {
-                      wallet: "Dompet Tabungan",
-                      description: "Transfer dari Gaji",
                       category: "Pendapatan",
                       amount: 4500000,
                       time: "1 hari yang lalu",
                       type: "income",
                     },
                     {
-                      wallet: "Dompet Investasi",
-                      description: "Dividen Saham",
                       category: "Investasi",
                       amount: 375000,
                       time: "3 hari yang lalu",
@@ -402,25 +396,6 @@ export default function Dashboard() {
                       key={index}
                       className="hover:bg-green-50 transition-colors duration-150"
                     >
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div
-                            className={`w-1.5 h-1.5 rounded-full mr-2 ${
-                              transaction.type === "income"
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                            }`}
-                          ></div>
-                          <div className="font-medium text-gray-900 text-sm">
-                            {transaction.wallet}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="text-sm text-gray-900">
-                          {transaction.description}
-                        </div>
-                      </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
                           {transaction.category}

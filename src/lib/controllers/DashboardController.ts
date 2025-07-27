@@ -1,5 +1,5 @@
 import { successResponse, errorResponse } from "@/utils/apiResponse";
-import { getDashboard, getDashboardViewsByMonth } from "../models/Dashboard";
+import { getDashboard, getTransactionAmountByMonth } from "../models/Dashboard";
 
 export async function fetchDashboard(session) {
   try {
@@ -13,7 +13,7 @@ export async function fetchDashboard(session) {
 
 export async function fetchDashboardMonthly(session) {
   try {
-    const cards = await getDashboardViewsByMonth(session);
+    const cards = await getTransactionAmountByMonth(session);
     return successResponse("Dashboard fetch successfully", cards, 201);
   } catch (error) {
     console.error("Error fetching users:", error);
