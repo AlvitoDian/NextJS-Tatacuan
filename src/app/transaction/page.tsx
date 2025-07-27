@@ -128,8 +128,8 @@ export default function ManageCard() {
   return (
     <div className="p-4 md:p-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shadow-lg rounded-lg md:p-10">
-        {/* Form User Password */}
-        <div className="lg:col-span1">
+        {/* Form Utama */}
+        <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
               <User2Icon className="h-6 w-6 text-green-600" />
@@ -177,13 +177,8 @@ export default function ManageCard() {
                 )}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Form Utama */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+            <h2 className="text-xl font-semibold mt-6 text-gray-800 mb-6 flex items-center gap-2">
               <DollarSign className="h-6 w-6 text-green-600" />
               Detail Transaksi
             </h2>
@@ -252,7 +247,7 @@ export default function ManageCard() {
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  className={`w-full focus:outline-none px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                     errors.category ? "border-red-500" : "border-gray-300"
                   }`}
                 >
@@ -283,7 +278,7 @@ export default function ManageCard() {
                     value={formData.amount}
                     onChange={handleInputChange}
                     placeholder="0"
-                    className={`w-full pl-10 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                    className={`w-full pl-10 focus:outline-none pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                       errors.amount ? "border-red-500" : "border-gray-300"
                     }`}
                   />
@@ -304,7 +299,7 @@ export default function ManageCard() {
                   name="date"
                   value={formData.date}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                  className={`w-full px-3 py-2 focus:outline-none text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                     errors.date ? "border-red-500" : "border-gray-300"
                   }`}
                 />
@@ -324,7 +319,7 @@ export default function ManageCard() {
                   onChange={handleInputChange}
                   placeholder="Tambahkan catatan tentang transaksi ini (opsional)"
                   rows={3}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 focus:outline-none text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                 />
               </div>
             </div>

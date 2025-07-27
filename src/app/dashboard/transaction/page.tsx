@@ -1,29 +1,17 @@
 "use client";
 
 import Breadcrumb from "@/components/Breadcrumb";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-  User,
-  Mail,
-  Lock,
-  Camera,
   Save,
-  Eye,
-  EyeOff,
   TrendingUp,
   TrendingDown,
   DollarSign,
   Calendar,
   Tag,
 } from "lucide-react";
-import { fetchUserByEmail } from "@/lib/api/user";
 import { useSession } from "next-auth/react";
 import Loader from "@/components/Loader";
-import Swal from "sweetalert2";
-import axios from "axios";
-import Image from "next/image";
-import toast from "react-hot-toast";
-import Button from "@/components/Button";
 import { useCallback } from "react";
 
 export default function Transaction() {
@@ -215,7 +203,7 @@ export default function Transaction() {
                       name="category"
                       value={formData.category}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                      className={`w-full focus:outline-none px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                         errors.category ? "border-red-500" : "border-gray-300"
                       }`}
                     >
@@ -248,7 +236,7 @@ export default function Transaction() {
                         value={formData.amount}
                         onChange={handleInputChange}
                         placeholder="0"
-                        className={`w-full pl-10 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                        className={`w-full focus:outline-none pl-10 pr-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                           errors.amount ? "border-red-500" : "border-gray-300"
                         }`}
                       />
@@ -267,11 +255,11 @@ export default function Transaction() {
                       Tanggal *
                     </div>
                     <input
-                      type="date"
+                      type="datetime-local"
                       name="date"
                       value={formData.date}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                      className={`w-full px-3 py-2 focus:outline-none text-sm border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
                         errors.date ? "border-red-500" : "border-gray-300"
                       }`}
                     />
@@ -291,7 +279,7 @@ export default function Transaction() {
                       onChange={handleInputChange}
                       placeholder="Tambahkan catatan tentang transaksi ini (opsional)"
                       rows={3}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                      className="w-full px-3 py-2 text-sm focus:outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                     />
                   </div>
                 </div>
