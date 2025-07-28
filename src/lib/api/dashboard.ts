@@ -21,3 +21,13 @@ export const fetchDashboardMonthly = async () => {
     throw error;
   }
 };
+
+export const fetchDashboardRecent = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/dashboard-recent`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching cards:", error);
+    throw error;
+  }
+};

@@ -97,8 +97,6 @@ export default function ManageCard() {
       toast.success("Transaksi sukses");
 
       setFormData({
-        email: "",
-        usrpw: "",
         category: "",
         type: "",
         amount: "",
@@ -193,27 +191,7 @@ export default function ManageCard() {
                   Jenis Transaksi *
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div
-                    onClick={() =>
-                      handleInputChange({
-                        target: { name: "type", value: "D" },
-                      })
-                    }
-                    className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      formData.type === "D"
-                        ? "border-green-500 bg-green-50 text-green-700"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      <div>
-                        <div className="text-sm font-medium">Pemasukan</div>
-                        <div className="text-xs text-gray-500">Debit</div>
-                      </div>
-                    </div>
-                  </div>
-
+                  {/* Pemasukan - Credit */}
                   <div
                     onClick={() =>
                       handleInputChange({
@@ -222,6 +200,28 @@ export default function ManageCard() {
                     }
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
                       formData.type === "C"
+                        ? "border-green-500 bg-green-50 text-green-700"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5" />
+                      <div>
+                        <div className="text-sm font-medium">Pemasukan</div>
+                        <div className="text-xs text-gray-500">Credit</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pengeluaran - Debit */}
+                  <div
+                    onClick={() =>
+                      handleInputChange({
+                        target: { name: "type", value: "D" },
+                      })
+                    }
+                    className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                      formData.type === "D"
                         ? "border-red-500 bg-red-50 text-red-700"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -230,7 +230,7 @@ export default function ManageCard() {
                       <TrendingDown className="h-5 w-5" />
                       <div>
                         <div className="text-sm font-medium">Pengeluaran</div>
-                        <div className="text-xs text-gray-500">Credit</div>
+                        <div className="text-xs text-gray-500">Debit</div>
                       </div>
                     </div>
                   </div>
@@ -339,27 +339,27 @@ export default function ManageCard() {
             <div className="space-y-4">
               <div
                 className={`p-4 rounded-lg ${
-                  formData.type === "D"
+                  formData.type === "C"
                     ? "bg-green-50 border border-green-200"
-                    : formData.type === "C"
+                    : formData.type === "D"
                     ? "bg-red-50 border border-red-200"
                     : "bg-gray-50 border border-gray-200"
                 }`}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  {formData.type === "D" && (
+                  {formData.type === "C" && (
                     <TrendingUp className="h-5 w-5 text-green-600" />
                   )}
-                  {formData.type === "C" && (
+                  {formData.type === "D" && (
                     <TrendingDown className="h-5 w-5 text-red-600" />
                   )}
                   {!formData.type && (
                     <DollarSign className="h-5 w-5 text-gray-400" />
                   )}
                   <span className="font-medium capitalize">
-                    {formData.type === "D"
+                    {formData.type === "C"
                       ? "Pemasukan"
-                      : formData.type === "C"
+                      : formData.type === "D"
                       ? "Pengeluaran"
                       : "Jenis Transaksi"}
                   </span>
@@ -367,15 +367,15 @@ export default function ManageCard() {
 
                 <div
                   className={`text-2xl font-bold ${
-                    formData.type === "D"
+                    formData.type === "C"
                       ? "text-green-600"
-                      : formData.type === "C"
+                      : formData.type === "D"
                       ? "text-red-600"
                       : "text-gray-400"
                   }`}
                 >
-                  {formData.type === "D" && "+"}
-                  {formData.type === "C" && "-"}
+                  {formData.type === "C" && "+"}
+                  {formData.type === "D" && "-"}
                   {formatPreviewAmount(formData.amount)}
                 </div>
               </div>
@@ -385,9 +385,7 @@ export default function ManageCard() {
                   <span className="text-gray-600">Kategori:</span>
                   <span className="font-medium">
                     {getSelectedCategory()
-                      ? `${getSelectedCategory().icon} ${
-                          getSelectedCategory().label
-                        }`
+                      ? `${getSelectedCategory().label}`
                       : "-"}
                   </span>
                 </div>

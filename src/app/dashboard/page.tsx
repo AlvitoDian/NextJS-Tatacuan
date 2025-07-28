@@ -9,60 +9,38 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import {
-  Wallet,
-  TrendingUp,
-  TrendingDown,
-  PiggyBank,
-  Calendar,
-  Copy,
-  ExternalLink,
-  Edit3,
-  CreditCard,
-  DollarSign,
-} from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, Calendar } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useEffect, useState } from "react";
-import { fetchDashboard, fetchDashboardMonthly } from "@/lib/api/dashboard";
+import {
+  fetchDashboard,
+  fetchDashboardMonthly,
+  fetchDashboardRecent,
+} from "@/lib/api/dashboard";
 import Loader from "@/components/Loader";
-import Link from "next/link";
 
 export default function Dashboard() {
   const breadcrumb = [{ label: "Dashboard", href: "/" }];
 
   const [data, setData] = useState(null);
   const [dataMonthly, setDataMonthly] = useState([]);
+  const [recent, setRecent] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  //? Mock data for financial dashboard
-  const mockFinancialData = [
-    { name: "Jan", income: 8500000, expense: 3200000 },
-    { name: "Feb", income: 7800000, expense: 4100000 },
-    { name: "Mar", income: 9200000, expense: 3800000 },
-    { name: "Apr", income: 8900000, expense: 4500000 },
-    { name: "May", income: 10100000, expense: 3600000 },
-    { name: "Jun", income: 9500000, expense: 4200000 },
-    { name: "Jul", income: 8700000, expense: 3900000 },
-    { name: "Aug", income: 9800000, expense: 4300000 },
-    { name: "Sep", income: 8400000, expense: 3700000 },
-    { name: "Oct", income: 9600000, expense: 4000000 },
-    { name: "Nov", income: 8800000, expense: 3500000 },
-    { name: "Dec", income: 10500000, expense: 4600000 },
-  ];
 
   //? Fetch Data
   const loadAllData = async () => {
     setIsLoading(true);
     try {
-      const [walletData, monthly] = await Promise.all([
+      const [walletData, monthly, recent] = await Promise.all([
         fetchDashboard(),
         fetchDashboardMonthly(),
+        fetchDashboardRecent(),
       ]);
       setData(walletData);
-      setDataMonthly(mockFinancialData);
+      setDataMonthly(monthly);
+      setRecent(recent);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      setDataMonthly(mockFinancialData);
     } finally {
       setIsLoading(false);
     }
@@ -71,37 +49,6 @@ export default function Dashboard() {
   useEffect(() => {
     loadAllData();
   }, []);
-
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const currentMonthName = monthNames[new Date().getMonth()];
-  const currentMonthData = dataMonthly?.find(
-    (item) => item.name === currentMonthName
-  );
-  const currentMonthIncome = currentMonthData?.income || 0;
-  const currentMonthExpense = currentMonthData?.expense || 0;
-
-  const totalBalance = dataMonthly.reduce(
-    (acc, month) => acc + (month.income - month.expense),
-    0
-  );
-  const totalIncome = dataMonthly.reduce((acc, month) => acc + month.income, 0);
-  const totalExpense = dataMonthly.reduce(
-    (acc, month) => acc + month.expense,
-    0
-  );
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("id-ID", {
@@ -190,7 +137,7 @@ export default function Dashboard() {
                     Total Saldo
                   </p>
                   <p className="text-xl font-bold text-gray-900">
-                    {formatCurrency(totalBalance)}
+                    {formatCurrency(data?.total_saldo)}
                   </p>
                 </div>
               </div>
@@ -207,7 +154,7 @@ export default function Dashboard() {
                     Total Pemasukan
                   </p>
                   <p className="text-xl font-bold text-green-600">
-                    {formatCurrency(totalIncome)}
+                    {formatCurrency(data?.total_pemasukan)}
                   </p>
                 </div>
               </div>
@@ -224,7 +171,7 @@ export default function Dashboard() {
                     Total Pengeluaran
                   </p>
                   <p className="text-xl font-bold text-red-600">
-                    {formatCurrency(totalExpense)}
+                    {formatCurrency(data?.total_pengeluaran)}
                   </p>
                 </div>
               </div>
@@ -241,7 +188,7 @@ export default function Dashboard() {
                     Bulan Ini
                   </p>
                   <p className="text-xl font-bold">
-                    {formatCurrency(currentMonthIncome - currentMonthExpense)}
+                    {formatCurrency(data?.saldo_bulan_ini)}
                   </p>
                 </div>
               </div>
@@ -338,60 +285,19 @@ export default function Dashboard() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                    >
-                      Dompet
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                    >
-                      Deskripsi
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                    >
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Kategori
                     </th>
-                    <th
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                    >
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Jumlah
                     </th>
-                    <th
-                      scope="col"
-                      className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                    >
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Waktu
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
-                  {/* Mock transaction data */}
-                  {[
-                    {
-                      category: "Belanja",
-                      amount: -1250000,
-                      time: "2 jam yang lalu",
-                      type: "expense",
-                    },
-                    {
-                      category: "Pendapatan",
-                      amount: 4500000,
-                      time: "1 hari yang lalu",
-                      type: "income",
-                    },
-                    {
-                      category: "Investasi",
-                      amount: 375000,
-                      time: "3 hari yang lalu",
-                      type: "income",
-                    },
-                  ].map((transaction, index) => (
+                  {recent.map((transaction, index) => (
                     <tr
                       key={index}
                       className="hover:bg-green-50 transition-colors duration-150"
@@ -404,7 +310,7 @@ export default function Dashboard() {
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div
                           className={`text-base font-bold ${
-                            transaction.type === "income"
+                            transaction.type === "C"
                               ? "text-green-600"
                               : "text-red-600"
                           }`}

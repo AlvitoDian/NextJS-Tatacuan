@@ -21,8 +21,8 @@ export async function createTransactionPublic(req: Request) {
     }
 
     const transaction = await postTransaction({
-      usrid: user.usrid,
-      catid: category,
+      usrid: parseInt(user.usrid),
+      catid: parseInt(category),
       notes: description || "",
       amount: parseFloat(amount),
       dcind: type,

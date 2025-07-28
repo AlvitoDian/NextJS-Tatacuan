@@ -2,29 +2,37 @@ import pool from "../db";
 
 export async function getDashboard(session) {
   const client = await pool.connect();
+
   try {
-    const result = await client.query(
+    const balanceResult = await client.query(
+      `SELECT amount FROM t_balance WHERE usrid = $1`,
+      [session.user.usrid]
+    );
+
+    const balanceRow = balanceResult.rows[0];
+    const total_saldo = parseFloat(balanceRow?.amount) || 0;
+
+    const transResult = await client.query(
       `
       SELECT
         SUM(CASE WHEN dcind = 'C' THEN amount ELSE 0 END) AS total_income,
         SUM(CASE WHEN dcind = 'D' THEN amount ELSE 0 END) AS total_expense,
-        SUM(CASE
-            WHEN dcind = 'C' AND date_trunc('month', date) = date_trunc('month', CURRENT_DATE) THEN amount
-            WHEN dcind = 'D' AND date_trunc('month', date) = date_trunc('month', CURRENT_DATE) THEN -amount
-            ELSE 0
-        END) AS this_month_balance
+        ABS(SUM(CASE
+        WHEN dcind = 'C' AND date_trunc('month', date) = date_trunc('month', CURRENT_DATE) THEN amount
+        WHEN dcind = 'D' AND date_trunc('month', date) = date_trunc('month', CURRENT_DATE) THEN -amount
+        ELSE 0
+      END)) AS this_month_balance
       FROM t_trans
       WHERE usrid = $1
       `,
       [session.user.usrid]
     );
 
-    const row = result.rows[0];
+    const row = transResult.rows[0];
 
     const total_pemasukan = parseFloat(row.total_income) || 0;
     const total_pengeluaran = parseFloat(row.total_expense) || 0;
     const saldo_bulan_ini = parseFloat(row.this_month_balance) || 0;
-    const total_saldo = total_pemasukan - total_pengeluaran;
 
     return {
       total_saldo,
@@ -59,8 +67,8 @@ export async function getTransactionAmountByMonth(session) {
       `
       SELECT
         EXTRACT(MONTH FROM date) AS month,
-        SUM(CASE WHEN dcind = 'C' THEN amount ELSE 0 END) AS expense,
-        SUM(CASE WHEN dcind = 'D' THEN amount ELSE 0 END) AS income
+        SUM(CASE WHEN dcind = 'D' THEN amount ELSE 0 END) AS expense,
+        SUM(CASE WHEN dcind = 'C' THEN amount ELSE 0 END) AS income
       FROM t_trans
       WHERE usrid = $1
       GROUP BY month
@@ -94,9 +102,9 @@ export async function getLatestTransactions(session) {
         t.amount,
         t.date,
         t.dcind,
-        c.name AS category
+        c.name1 AS category
       FROM t_trans t
-      LEFT JOIN m_category c ON c.catid = t.catid
+      LEFT JOIN m_catgr c ON c.catid = t.catid
       WHERE t.usrid = $1
       ORDER BY t.date DESC
       LIMIT 5
@@ -131,7 +139,7 @@ export async function getLatestTransactions(session) {
         category: row.category || "Tanpa Kategori",
         amount: isIncome ? parseFloat(row.amount) : -parseFloat(row.amount),
         time: getRelativeTime(row.date),
-        type: isIncome ? "income" : "expense",
+        type: row.dcind,
       };
     });
 
