@@ -32,17 +32,6 @@ export default function AccountSettings() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   //? Fetch Data
-  const fetchData = async () => {
-    try {
-      const [cardsData] = await Promise.all([
-        fetchUserByEmail(session.user.email),
-      ]);
-      setFormData(cardsData);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    }
-  };
-
   const loadAllData = async () => {
     setIsLoading(true);
     try {

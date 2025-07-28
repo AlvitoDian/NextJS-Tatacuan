@@ -102,3 +102,32 @@ export async function updateUser(data: UserUpdatePayload, usrid: string) {
     client.release();
   }
 }
+
+export async function verifyUser(email: string, password: string) {
+  const client = await pool.connect();
+
+  try {
+    const sanitizedEmail = sanitizeInput(email, "string");
+    const sanitizedPassword = sanitizeInput(password, "string");
+
+    const result = await client.query(
+      "SELECT usrid, email, usrpw FROM m_user WHERE email = $1",
+      [sanitizedEmail]
+    );
+
+    const user = result.rows[0];
+    if (!user) return null;
+
+    const isMatch = await bcrypt.compare(sanitizedPassword, user.usrpw);
+    if (!isMatch) return null;
+
+    delete user.usrpw;
+
+    return user;
+  } catch (error) {
+    console.error("Login error:", error);
+    return null;
+  } finally {
+    client.release();
+  }
+}

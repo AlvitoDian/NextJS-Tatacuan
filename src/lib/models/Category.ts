@@ -1,6 +1,23 @@
 import pool from "../db";
 
-export async function getAllCategory(session) {
+export async function getAllCategory() {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(
+      `SELECT 
+    * 
+        FROM 
+    m_catgr
+        `,
+      []
+    );
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+export async function getAllCategoryByUser(session) {
   const client = await pool.connect();
   try {
     const result = await client.query(

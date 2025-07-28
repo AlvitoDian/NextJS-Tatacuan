@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Gauge, ChevronDown, User, HandCoins } from "lucide-react";
+import {
+  Gauge,
+  ChevronDown,
+  User,
+  HandCoins,
+  ScrollText,
+  List,
+} from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -14,14 +21,26 @@ const menuItems = [
     href: "/dashboard",
   },
   {
-    id: "manage",
-    label: "Transaction",
+    id: "transaction",
+    label: "Transaksi",
     icon: <HandCoins color="#16a34a" strokeWidth={2.25} size={20} />,
     href: "/dashboard/transaction",
   },
   {
+    id: "transaction-list",
+    label: "Daftar Transaksi",
+    icon: <ScrollText color="#16a34a" strokeWidth={2.25} size={20} />,
+    href: "/dashboard/category",
+  },
+  {
+    id: "category",
+    label: "Kategori",
+    icon: <List color="#16a34a" strokeWidth={2.25} size={20} />,
+    href: "/dashboard/transaction-list",
+  },
+  {
     id: "account-settings",
-    label: "Account Settings",
+    label: "Pengaturan Akun",
     icon: <User color="#16a34a" strokeWidth={2.25} size={20} />,
     href: "/dashboard/account-settings",
   },

@@ -1,19 +1,10 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
-import Breadcrumb from "@/components/Breadcrumb";
-import FormCard from "@/components/CardSelect";
-import Modal from "@/components/Modal";
-import { fetchCards } from "@/lib/api/card";
-import Swal from "sweetalert2";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import Loader from "@/components/Loader";
+import { useState, useCallback, useEffect } from "react";
+
 import {
   Calendar,
-  CreditCard,
   DollarSign,
-  Mail,
   Save,
   Tag,
   TrendingDown,
@@ -21,40 +12,48 @@ import {
   User,
   User2Icon,
 } from "lucide-react";
+import { fetchCategory } from "@/lib/api/category";
+import {
+  createTransaction,
+  createTransactionPublic,
+} from "@/lib/api/transaction";
+import toast from "react-hot-toast";
 
 export default function ManageCard() {
-  const breadcrumb = [
-    { label: "Home", href: "/" },
-    { label: "Transaction", href: "/dashboard/transaction" },
-  ];
   const [formData, setFormData] = useState({
     email: "",
     usrpw: "",
     category: "",
     type: "",
-    method: "",
     amount: "",
     description: "",
     date: new Date().toISOString().split("T")[0],
   });
-
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const categories = [
-    { value: "food", label: "Food & Dining", icon: "🍽️" },
-    { value: "transportation", label: "Transportation", icon: "🚗" },
-    { value: "entertainment", label: "Entertainment", icon: "🎬" },
-    { value: "shopping", label: "Shopping", icon: "🛍️" },
-    { value: "utilities", label: "Utilities", icon: "💡" },
-    { value: "healthcare", label: "Healthcare", icon: "🏥" },
-    { value: "education", label: "Education", icon: "📚" },
-    { value: "salary", label: "Salary", icon: "💼" },
-    { value: "freelance", label: "Freelance", icon: "💻" },
-    { value: "investment", label: "Investment", icon: "📈" },
-    { value: "gift", label: "Gift", icon: "🎁" },
-    { value: "other", label: "Other", icon: "📝" },
-  ];
+  //? Fetch Data
+  const loadAllData = async () => {
+    setIsLoading(true);
+    try {
+      const [categoriesData] = await Promise.all([fetchCategory()]);
+      const formattedCategories = categoriesData.map((catg) => ({
+        value: catg.catid,
+        label: catg.name1,
+      }));
+
+      setCategories(formattedCategories);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    loadAllData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -72,45 +71,49 @@ export default function ManageCard() {
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = useCallback(() => {
+    const newErrors: Record<string, string> = {};
 
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.usrpw) newErrors.usrpw = "Password is required";
     if (!formData.category) newErrors.category = "Category is required";
     if (!formData.type) newErrors.type = "Transaction type is required";
-    if (!formData.method) newErrors.method = "Payment method is required";
     if (!formData.amount || formData.amount <= 0)
       newErrors.amount = "Valid amount is required";
     if (!formData.date) newErrors.date = "Date is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData, setErrors]);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      alert("Transaction added successfully!");
-      setIsSubmitting(false);
+    try {
+      await createTransactionPublic(formData);
 
-      // Reset form
+      toast.success("Transaksi sukses");
+
       setFormData({
         email: "",
         usrpw: "",
         category: "",
         type: "",
-        method: "",
         amount: "",
         description: "",
         date: new Date().toISOString().split("T")[0],
       });
-    }, 1500);
-  }, [formData]);
+    } catch (error) {
+      console.error("Failed to submit transaction:", error);
+      toast.error(
+        error.response.data.message || "Failed to create transaction"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [formData, validateForm]);
 
   const formatPreviewAmount = (amount) => {
     if (!amount) return "Rp 0";
@@ -193,11 +196,11 @@ export default function ManageCard() {
                   <div
                     onClick={() =>
                       handleInputChange({
-                        target: { name: "type", value: "income" },
+                        target: { name: "type", value: "D" },
                       })
                     }
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      formData.type === "income"
+                      formData.type === "D"
                         ? "border-green-500 bg-green-50 text-green-700"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -206,7 +209,7 @@ export default function ManageCard() {
                       <TrendingUp className="h-5 w-5" />
                       <div>
                         <div className="text-sm font-medium">Pemasukan</div>
-                        <div className="text-xs text-gray-500">Income</div>
+                        <div className="text-xs text-gray-500">Debit</div>
                       </div>
                     </div>
                   </div>
@@ -214,11 +217,11 @@ export default function ManageCard() {
                   <div
                     onClick={() =>
                       handleInputChange({
-                        target: { name: "type", value: "expense" },
+                        target: { name: "type", value: "C" },
                       })
                     }
                     className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                      formData.type === "expense"
+                      formData.type === "C"
                         ? "border-red-500 bg-red-50 text-red-700"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
@@ -227,7 +230,7 @@ export default function ManageCard() {
                       <TrendingDown className="h-5 w-5" />
                       <div>
                         <div className="text-sm font-medium">Pengeluaran</div>
-                        <div className="text-xs text-gray-500">Expense</div>
+                        <div className="text-xs text-gray-500">Credit</div>
                       </div>
                     </div>
                   </div>
@@ -336,27 +339,27 @@ export default function ManageCard() {
             <div className="space-y-4">
               <div
                 className={`p-4 rounded-lg ${
-                  formData.type === "income"
+                  formData.type === "D"
                     ? "bg-green-50 border border-green-200"
-                    : formData.type === "expense"
+                    : formData.type === "C"
                     ? "bg-red-50 border border-red-200"
                     : "bg-gray-50 border border-gray-200"
                 }`}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  {formData.type === "income" && (
+                  {formData.type === "D" && (
                     <TrendingUp className="h-5 w-5 text-green-600" />
                   )}
-                  {formData.type === "expense" && (
+                  {formData.type === "C" && (
                     <TrendingDown className="h-5 w-5 text-red-600" />
                   )}
                   {!formData.type && (
                     <DollarSign className="h-5 w-5 text-gray-400" />
                   )}
                   <span className="font-medium capitalize">
-                    {formData.type === "income"
+                    {formData.type === "D"
                       ? "Pemasukan"
-                      : formData.type === "expense"
+                      : formData.type === "C"
                       ? "Pengeluaran"
                       : "Jenis Transaksi"}
                   </span>
@@ -364,15 +367,15 @@ export default function ManageCard() {
 
                 <div
                   className={`text-2xl font-bold ${
-                    formData.type === "income"
+                    formData.type === "D"
                       ? "text-green-600"
-                      : formData.type === "expense"
+                      : formData.type === "C"
                       ? "text-red-600"
                       : "text-gray-400"
                   }`}
                 >
-                  {formData.type === "income" && "+"}
-                  {formData.type === "expense" && "-"}
+                  {formData.type === "D" && "+"}
+                  {formData.type === "C" && "-"}
                   {formatPreviewAmount(formData.amount)}
                 </div>
               </div>

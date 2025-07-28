@@ -11,3 +11,13 @@ export const createTransaction = async (payload) => {
     throw error;
   }
 };
+
+export const createTransactionPublic = async (payload) => {
+  try {
+    const response = await axios.post(`${API_URL}/transaction-public`, payload);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
